@@ -1,4 +1,4 @@
-# my-gift-list
+# My Gift List
 Simulates a gift list with JWT authentication
 
 ## Atention
