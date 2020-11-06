@@ -2,7 +2,6 @@ package br.com.dev.mygiftlist.config.filters
 
 import br.com.dev.mygiftlist.dtos.UserDTO
 import br.com.dev.mygiftlist.services.TokenAuthenticationService.addAuthentication
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.springframework.security.authentication.AuthenticationManager
@@ -17,7 +16,6 @@ import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-
 
 class JWTLoginFilter(url: String?, authManager: AuthenticationManager?) : AbstractAuthenticationProcessingFilter(AntPathRequestMatcher(url)) {
 
@@ -43,6 +41,15 @@ class JWTLoginFilter(url: String?, authManager: AuthenticationManager?) : Abstra
             auth: Authentication) {
         addAuthentication(response!!, auth.name)
     }
+
+    @Throws(IOException::class, ServletException::class)
+    override fun unsuccessfulAuthentication(request: HttpServletRequest?,
+                                            response: HttpServletResponse?,
+                                            failed: AuthenticationException?) {
+        super.unsuccessfulAuthentication(request, response, failed)
+//        addError(response!!, failed!!)
+    }
+
 
     init {
         authenticationManager = authManager
