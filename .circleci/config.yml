@@ -21,10 +21,9 @@ jobs:
       - deploy:
          name: Deploy to Heroku if tests pass and branch is master
          command: |
-           if [ "${CIRCLE_BRANCH}" == "circleci-project-setup" ]; then
-             git push --force git@heroku.com:$HEROKU_APP_NAME.git HEAD:refs/heads/master
-             <any other necessary commands for heroku deployment you might need can go here>
-           fi
+          if [ "${CIRCLE_BRANCH}" == "circleci-project-setup" ]; then
+           git push --force git@heroku.com:$HEROKU_APP_NAME.git HEAD:refs/heads/master
+          fi
 #  build:
 #    docker:
 #      - image: circleci/ruby:2.4-node
