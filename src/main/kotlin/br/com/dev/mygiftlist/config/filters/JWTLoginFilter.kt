@@ -2,6 +2,7 @@ package br.com.dev.mygiftlist.config.filters
 
 import br.com.dev.mygiftlist.dtos.UserDTO
 import br.com.dev.mygiftlist.services.TokenAuthenticationService.addAuthentication
+import br.com.dev.mygiftlist.services.TokenAuthenticationService.addError
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.springframework.security.authentication.AuthenticationManager
@@ -24,7 +25,7 @@ class JWTLoginFilter(url: String?, authManager: AuthenticationManager?) : Abstra
         val mapper = JsonMapper.builder().addModule(KotlinModule()).build()
 
         val credentials: UserDTO = mapper.readValue(request.inputStream, UserDTO::class.java)
-        return authenticationManager.authenticate(
+        return this.authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(
                         credentials.username,
                         credentials.password,

@@ -55,6 +55,9 @@ object TokenAuthenticationService {
         response.contentType = "application/json"
         val myResponse = MyResponseDTO("fail", ErrorDTO(failed.message ?: "Some error occurred"))
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, mapper.writeValueAsString(myResponse))
+        val out: PrintWriter? = response.writer
+        out?.print(mapper.writeValueAsString(myResponse))
+        out?.flush()
     }
 
     fun getAuthentication(request: HttpServletRequest): Authentication? {
