@@ -13,9 +13,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-
 
 @Configuration
 @EnableWebSecurity
@@ -26,26 +24,33 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     override fun configure(httpSecurity: HttpSecurity) {
         httpSecurity.csrf().disable().authorizeRequests()
-//                .antMatchers(HttpMethod.POST, "/token/*").permitAll()
-//                .anyRequest().authenticated()
-                .anyRequest().permitAll()
-//                .and()
-//                // filtra requisições de login
-//                .addFilterBefore(JWTLoginFilter("/token/*", authenticationManager()),
-//                        UsernamePasswordAuthenticationFilter::class.java)
-//                // filtra outras requisições para verificar a presença do JWT no header
-//                .addFilterBefore(JWTAuthenticationFilter(),
-//                        UsernamePasswordAuthenticationFilter::class.java)
+            .antMatchers(HttpMethod.POST, "/tokens/generate").permitAll()
+            .antMatchers(HttpMethod.POST, "/users/register").permitAll()
+            .anyRequest().authenticated()
+            .and()
+            // filtra requisições de login
+            .addFilterBefore(
+                JWTLoginFilter("/tokens/generate", authenticationManager()),
+                UsernamePasswordAuthenticationFilter::class.java
+            )
+            // filtra outras requisições para verificar a presença do JWT no header
+            .addFilterBefore(JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
     }
 
-    override fun configure(web: WebSecurity) {
-        web.ignoring().antMatchers("/v3/api-docs/**", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html/**", "/swagger-ui/**", "/webjars/**")
+    override fun configure(webSecurity: WebSecurity) {
+        webSecurity.ignoring().antMatchers(
+            "/v3/api-docs/**",
+            "/configuration/ui",
+            "/swagger-resources/**",
+            "/configuration/**",
+            "/swagger-ui.html/**",
+            "/swagger-ui/**",
+            "/webjars/**"
+        )
     }
 
     @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
-    }
+    fun passwordEncoder() = BCryptPasswordEncoder()
 
     override fun configure(builder: AuthenticationManagerBuilder) {
         builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder())

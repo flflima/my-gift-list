@@ -10,6 +10,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
@@ -22,15 +23,15 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 object TokenAuthenticationService {
-    //FIXME
+
     private const val EXPIRATION_TIME_IN_MINUTES: Long = 10
-    private const val SECRET = "MySecret"
+    private const val SECRET = "F)J@NcRfUjXn2r5u8x/A%D*G-KaPdSgVkYp3s6v9y\$B&E(H+MbQeThWmZq4t7w!z%C*F-J@NcRfUjXn2r5u8x/A?D(G+KbPdSgVkYp3s6v9y\$B&E)H@McQfThWmZq4t7"
     private const val TOKEN_PREFIX = "Bearer"
     private const val HEADER_STRING = "Authorization"
     private val mapper = JsonMapper.builder()
-            .addModule(KotlinModule())
-            .addModule(JavaTimeModule())
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false).build()
+        .addModule(KotlinModule())
+        .addModule(JavaTimeModule())
+        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false).build()
 
     fun addAuthentication(response: HttpServletResponse, username: String) {
 
@@ -40,39 +41,42 @@ object TokenAuthenticationService {
         response.contentType = "application/json"
 
         val myResponse = MyResponseDTO("success", MyTokenDTO("$TOKEN_PREFIX $jwt", expirationDate))
-        val out: PrintWriter? = response.writer
-        out?.print(mapper.writeValueAsString(myResponse))
-        out?.flush()
+        val out: PrintWriter = response.writer
+        out.print(mapper.writeValueAsString(myResponse))
+        out.flush()
     }
 
-    fun generateToken(username: String, expirationDate: LocalDateTime = LocalDateTime.now().plusMinutes(EXPIRATION_TIME_IN_MINUTES)): String {
+    fun generateToken(
+        username: String,
+        expirationDate: LocalDateTime = LocalDateTime.now().plusMinutes(EXPIRATION_TIME_IN_MINUTES)
+    ): String {
         val key: Key = Keys.secretKeyFor(SignatureAlgorithm.HS256)
         return Jwts.builder()
-                .setSubject(username)
-                //FIXME
-                .setExpiration(Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant()))
-                .signWith(key)
-                .compact()
+            .setSubject(username)
+            .setExpiration(Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant()))
+            .signWith(key)
+            .compact()
     }
 
     fun addError(response: HttpServletResponse, failed: AuthenticationException) {
         response.contentType = "application/json"
+        response.status = HttpStatus.UNAUTHORIZED.value()
+
         val myResponse = MyResponseDTO("fail", ErrorDTO(failed.message ?: "Some error occurred"))
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, mapper.writeValueAsString(myResponse))
-        val out: PrintWriter? = response.writer
-        out?.print(mapper.writeValueAsString(myResponse))
-        out?.flush()
+        val out: PrintWriter = response.writer
+        out.print(mapper.writeValueAsString(myResponse))
+        out.flush()
     }
 
     fun getAuthentication(request: HttpServletRequest): Authentication? {
         val token = request.getHeader(HEADER_STRING)
         if (token != null) {
             val user: String = Jwts.parserBuilder()
-                    .setSigningKey(SECRET)
-                    .build()
-                    .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
-                    .body
-                    .subject
+                .setSigningKey(SECRET)
+                .build()
+                .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
+                .body
+                .subject
 
             return UsernamePasswordAuthenticationToken(user, null, emptyList())
         }

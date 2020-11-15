@@ -12,13 +12,18 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import java.io.IOException
-import java.util.*
+import java.util.Collections
 import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class JWTLoginFilter(url: String?, authManager: AuthenticationManager?) : AbstractAuthenticationProcessingFilter(AntPathRequestMatcher(url)) {
+class JWTLoginFilter(url: String, authManager: AuthenticationManager) :
+    AbstractAuthenticationProcessingFilter(AntPathRequestMatcher(url)) {
+
+    init {
+        authenticationManager = authManager
+    }
 
     @Throws(AuthenticationException::class, IOException::class, ServletException::class)
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
@@ -26,33 +31,30 @@ class JWTLoginFilter(url: String?, authManager: AuthenticationManager?) : Abstra
 
         val credentials: UserDTO = mapper.readValue(request.inputStream, UserDTO::class.java)
         return this.authenticationManager.authenticate(
-                UsernamePasswordAuthenticationToken(
-                        credentials.username,
-                        credentials.password,
-                        Collections.emptyList()
-                )
+            UsernamePasswordAuthenticationToken(
+                credentials.username,
+                credentials.password,
+                Collections.emptyList()
+            )
         )
     }
 
     @Throws(IOException::class, ServletException::class)
     override fun successfulAuthentication(
-            request: HttpServletRequest?,
-            response: HttpServletResponse?,
-            filterChain: FilterChain?,
-            auth: Authentication) {
-        addAuthentication(response!!, auth.name)
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain,
+        auth: Authentication
+    ) {
+        addAuthentication(response, auth.name)
     }
 
     @Throws(IOException::class, ServletException::class)
-    override fun unsuccessfulAuthentication(request: HttpServletRequest?,
-                                            response: HttpServletResponse?,
-                                            failed: AuthenticationException?) {
-        super.unsuccessfulAuthentication(request, response, failed)
-//        addError(response!!, failed!!)
-    }
-
-
-    init {
-        authenticationManager = authManager
+    override fun unsuccessfulAuthentication(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        failed: AuthenticationException
+    ) {
+        addError(response, failed)
     }
 }
