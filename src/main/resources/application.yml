@@ -2,6 +2,7 @@ spring:
   data:
     mongodb:
       uri: ${MONGO_URL}
+      auto-index-creation: true
 
 springdoc:
   swagger-ui:

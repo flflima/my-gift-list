@@ -32,16 +32,10 @@ object TokenAuthenticationService {
             .addModule(JavaTimeModule())
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false).build()
 
-    fun addAuthentication(response: HttpServletResponse, username: String?) {
+    fun addAuthentication(response: HttpServletResponse, username: String) {
 
-        val key: Key = Keys.secretKeyFor(SignatureAlgorithm.HS256)
         val expirationDate = LocalDateTime.now().plusMinutes(EXPIRATION_TIME_IN_MINUTES)
-        val jwt: String = Jwts.builder()
-                .setSubject(username)
-                //FIXME
-                .setExpiration(Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant()))
-                .signWith(key)
-                .compact()
+        val jwt = generateToken(username, expirationDate)
 
         response.contentType = "application/json"
 
@@ -49,6 +43,16 @@ object TokenAuthenticationService {
         val out: PrintWriter? = response.writer
         out?.print(mapper.writeValueAsString(myResponse))
         out?.flush()
+    }
+
+    fun generateToken(username: String, expirationDate: LocalDateTime = LocalDateTime.now().plusMinutes(EXPIRATION_TIME_IN_MINUTES)): String {
+        val key: Key = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+        return Jwts.builder()
+                .setSubject(username)
+                //FIXME
+                .setExpiration(Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant()))
+                .signWith(key)
+                .compact()
     }
 
     fun addError(response: HttpServletResponse, failed: AuthenticationException) {

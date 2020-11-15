@@ -26,24 +26,17 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     override fun configure(httpSecurity: HttpSecurity) {
         httpSecurity.csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/token/*").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                // filtra requisições de login
-                .addFilterBefore(JWTLoginFilter("/token/*", authenticationManager()),
-                        UsernamePasswordAuthenticationFilter::class.java)
-                // filtra outras requisições para verificar a presença do JWT no header
-                .addFilterBefore(JWTAuthenticationFilter(),
-                        UsernamePasswordAuthenticationFilter::class.java)
+//                .antMatchers(HttpMethod.POST, "/token/*").permitAll()
+//                .anyRequest().authenticated()
+                .anyRequest().permitAll()
+//                .and()
+//                // filtra requisições de login
+//                .addFilterBefore(JWTLoginFilter("/token/*", authenticationManager()),
+//                        UsernamePasswordAuthenticationFilter::class.java)
+//                // filtra outras requisições para verificar a presença do JWT no header
+//                .addFilterBefore(JWTAuthenticationFilter(),
+//                        UsernamePasswordAuthenticationFilter::class.java)
     }
-
-//    override fun configure(auth: AuthenticationManagerBuilder) {
-//        // cria uma conta default
-//        auth.inMemoryAuthentication()
-//                .withUser("admin")
-//                .password("{noop}password")
-//                .roles("ADMIN")
-//    }
 
     override fun configure(web: WebSecurity) {
         web.ignoring().antMatchers("/v3/api-docs/**", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html/**", "/swagger-ui/**", "/webjars/**")

@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "user")
-data class User(@Id val id: ObjectId, @Indexed(unique = true) val username: String, val password: String)
+data class UserDocument(@Id val id: ObjectId?, @Indexed(name = "unique_username_uk", unique = true) val username: String, val password: String)
 
-fun User.toUserDTO(): UserDTO {
+fun UserDocument.toUserDTO(): UserDTO {
     return UserDTO(this.username, this.password)
 }
