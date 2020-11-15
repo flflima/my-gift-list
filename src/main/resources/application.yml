@@ -8,7 +8,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-application-description: teste
+application-description: Creates an user, generate a token, add a gift to the list ;)
 application-version: 0.0.1
 
 logging:
