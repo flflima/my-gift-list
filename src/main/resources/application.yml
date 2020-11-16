@@ -1,0 +1,16 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URL}
+      auto-index-creation: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+application-description: Creates an user, generate a token, add a gift to the list ;)
+application-version: 0.0.1
+
+logging:
+  level:
+    root: INFO
