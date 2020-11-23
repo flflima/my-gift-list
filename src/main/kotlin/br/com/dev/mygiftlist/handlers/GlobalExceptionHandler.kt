@@ -13,7 +13,13 @@ import javax.servlet.http.HttpServletRequest
 class GlobalExceptionHandler {
 
     @ExceptionHandler(value = [UserAlreadyRegisteredException::class])
-    fun defaultErrorHandler(req: HttpServletRequest, e: UserAlreadyRegisteredException): ResponseEntity<MyResponseDTO<ErrorDTO>> =
-            ResponseEntity(MyResponseDTO("fail", ErrorDTO(message = e.message!!)), HttpStatus.CONFLICT)
+    fun defaultErrorHandler(
+        req: HttpServletRequest,
+        e: UserAlreadyRegisteredException
+    ): ResponseEntity<MyResponseDTO<ErrorDTO>> =
+        ResponseEntity(
+            MyResponseDTO("fail", ErrorDTO(message = e.message ?: "An error occurred!")),
+            HttpStatus.CONFLICT
+        )
 
 }

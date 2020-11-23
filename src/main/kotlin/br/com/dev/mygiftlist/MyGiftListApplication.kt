@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class MyGiftListApplication
 
 fun main(args: Array<String>) {
-	runApplication<MyGiftListApplication>(*args)
+    runApplication<MyGiftListApplication>(*args)
 }

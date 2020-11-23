@@ -18,7 +18,12 @@ class UserController {
     @Autowired
     private lateinit var userService: UserService
 
-    @RequestMapping(value = ["/register"], method = [RequestMethod.POST], consumes = ["application/json"], produces = ["application/json"])
+    @RequestMapping(
+        value = ["/register"],
+        method = [RequestMethod.POST],
+        consumes = ["application/json"],
+        produces = ["application/json"]
+    )
     @Throws(AuthenticationException::class)
     fun register(@RequestBody user: UserDTO): ResponseEntity<Any> {
         this.userService.createUser(user)

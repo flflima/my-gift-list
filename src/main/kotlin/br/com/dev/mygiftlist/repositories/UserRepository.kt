@@ -6,6 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserRepository: MongoRepository<UserDocument, ObjectId> {
+interface UserRepository : MongoRepository<UserDocument, ObjectId> {
     fun findByUsername(username: String): UserDocument?
 }
