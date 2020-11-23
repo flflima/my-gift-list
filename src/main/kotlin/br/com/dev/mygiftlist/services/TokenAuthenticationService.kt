@@ -14,10 +14,10 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.stereotype.Service
 import java.io.PrintWriter
-import java.security.Key
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
+import java.util.Optional
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -26,8 +26,7 @@ open class TokenAuthenticationService {
 
     companion object {
         private const val EXPIRATION_TIME_IN_MINUTES: Long = 10
-        private const val SECRET =
-            "F)J@NcRfUjXn2r5u8x/A%D*G-KaPdSgVkYp3s6v9y\$B&E(H+MbQeThWmZq4t7w!z%C*F-J@NcRfUjXn2r5u8x/A?D(G+KbPdSgVkYp3s6v9y\$B&E)H@McQfThWmZq4t7"
+        private const val SECRET = "EJ7bZVzbYlwc5jfCKWoDG6te5gPLL1eteuw="
         private const val TOKEN_PREFIX = "Bearer"
         private const val HEADER_STRING = "Authorization"
     }
@@ -68,12 +67,18 @@ open class TokenAuthenticationService {
         out.flush()
     }
 
-    fun getAuthentication(request: HttpServletRequest): Authentication = UsernamePasswordAuthenticationToken(
-        Jwts.parserBuilder()
-            .setSigningKey(SECRET)
-            .build()
-            .parseClaimsJws((request.getHeader(HEADER_STRING) ?: "").replace(TOKEN_PREFIX, ""))
-            .body
-            .subject, null, emptyList()
-    )
+    fun getAuthentication(request: HttpServletRequest) = if (request.getHeader(HEADER_STRING) != null) {
+        Optional.of(
+            UsernamePasswordAuthenticationToken(
+                Jwts.parserBuilder()
+                    .setSigningKey(SECRET)
+                    .build()
+                    .parseClaimsJws((request.getHeader(HEADER_STRING) ?: "").replace(TOKEN_PREFIX, ""))
+                    .body
+                    .subject, null, emptyList()
+            )
+        )
+    } else {
+        Optional.empty()
+    }
 }

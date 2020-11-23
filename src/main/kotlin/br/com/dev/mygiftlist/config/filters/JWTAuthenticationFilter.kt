@@ -21,9 +21,12 @@ class JWTAuthenticationFilter : GenericFilterBean() {
 
     @Throws(IOException::class, ServletException::class)
     override fun doFilter(request: ServletRequest, response: ServletResponse, filterChain: FilterChain) {
-        val authentication: Authentication? =
-            this.tokenAuthenticationService.getAuthentication((request as HttpServletRequest))
-        SecurityContextHolder.getContext().authentication = authentication
+        val authentication = this.tokenAuthenticationService.getAuthentication(request as HttpServletRequest)
+
+        if (authentication.isPresent) {
+            SecurityContextHolder.getContext().authentication = authentication.get()
+        }
+
         filterChain.doFilter(request, response)
     }
 }
